@@ -2,17 +2,23 @@
 #define D_A_OBJ_FIREWALL_H
 
 #include "JSystem/JParticle/JPAEmitter.h"
-#include "SSystem/SComponent/c_bg_w.h"
 #include "d/d_bg_w.h"
 #include "d/d_cc_d.h"
 #include "f_op/f_op_actor.h"
+#include "d/d_a_obj.h"
+
 #include "m_Do/m_Do_ext.h"
 
 class daObjFirewall_c : public fopAc_ac_c {
 public:
     typedef void (daObjFirewall_c::*memberFuncPtr)();
 
-    void param_get_swSave() const {}
+    enum Param_e {
+        PRM_SWSAVE_W = 0x08,
+        PRM_SWSAVE_S = 0x00,
+    };
+
+    s32 param_get_swSave() const { return daObj::PrmAbstract<Param_e>(this, PRM_SWSAVE_W, PRM_SWSAVE_S); }
 
     void init_mtx();
     static BOOL solidHeapCB(fopAc_ac_c*);
@@ -51,22 +57,19 @@ public:
     /* 0x438 */ JPABaseEmitter* field_0x438[6];
     /* 0x450 */ JPABaseEmitter* field_0x450[5];
     /* 0x464 */ JPABaseEmitter* field_0x464[2]; // guess
-    /* 0x46c */ LIGHT_INFLUENCE* field_0x46c[64];
-    /* 0x56c */
-    
-    /* 0xc6c */ Vec field_0xc6c[64]; //wrong something bigger I am thinking.
-    
+    /* 0x46c */ LIGHT_INFLUENCE field_0x46c[64];
+    /* 0xc6c */ Vec field_0xc6c[64];
+    /* 0xf6c */u8 field_0xf6c[0x106c-0xf6c]; // filler
+
     /* 0x106c */ s32 field_0x106c;
 
     /* 0x1070 */ memberFuncPtr field_0x1070;
-    /* 0x1074 */ s32 field_0x1074;
+    /* 0x1074 */ memberFuncPtr field_0x1074;
     /* 0x1078 */ memberFuncPtr field_0x1078; // this is prob a pointer
-    
     /* 0x107c */ u16 field_0x107c; // event id?
     /* 0x107e */ bool field_0x107e;
 
     /* 0x1080 */ Vec field_0x1080[8];
-    
     /* 0x10e0 */ u8 field_0x10e0;
     /* 0x10e1 */ u8 field_0x10e1;
     
