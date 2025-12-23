@@ -11,18 +11,17 @@
 #include "d/d_priority.h"
 #include "m_Do/m_Do_mtx.h"
 #include "d/d_bg_w.h"
+#include "d/d_com_inf_game.h"
 
-static int l_enter_angl_band;
+
 namespace {
+static int l_enter_angl_band;
 static const char l_arcname[] = "Yswdr00";
 //static int l_cyl_sr;
 static const char l_ev_name[] = "btl_of_swroom";
 static const char l_ev_name2[] = "btl_of_swroom2";
 static const char* l_ev_name_table[] = {l_ev_name, l_ev_name2};
-
 }
-
-
 
 /* 00000078-000000EC       .text init_mtx__15daObjFirewall_cFv */
 void daObjFirewall_c::init_mtx() {
@@ -50,16 +49,39 @@ bool daObjFirewall_c::create_heap() {
     
     J3DModel* model = mDoExt_J3DModel__create(modelData,0x80000,0x11000222);
     dBgW_NewSet((cBgD_t*)dComIfG_getObjectRes(l_arcname, 0xf), cBgW::MOVE_BG_e, &model->getBaseTRMtx());
-    field_0x40c.init(modelData, pbtk, true, 2, 1.0f, 0, -1, false, FALSE);
-    field_0x420.init(modelData, pbrk, true, 0, 1.0f, 0, -1, false, 0);
-    
-
+    int local_1 = field_0x40c.init(modelData, pbtk, true, 2, 1.0f, 0, -1, false, FALSE);
+    int local_2 = field_0x420.init(modelData, pbrk, true, 0, 1.0f, 0, -1, false, 0);
+    if(local_1 == 0 || local_2 == 0) {
+        return false;
+    }
     return true;
 }
 
 /* 000002DC-00000568       .text registCollisionTable__15daObjFirewall_cFv */
 void daObjFirewall_c::registCollisionTable() {
     /* Nonmatching */
+
+    f32 local_2;
+    s16 local_1 = cM_atan2s(dComIfGp_getPlayer(0)->current.pos.y, dComIfGp_getPlayer(0)->current.pos.x);
+    if(abs(local_1) > l_enter_angl_band) {
+        
+    } else {
+        for (int i=0; i<6; i++) {
+            local_2 = JMASCos(0x3f);
+        }
+    }
+    
+    cXyz a;
+    a.y = current.pos.y - 300;
+    a.z = current.pos.z;
+    a.x = current.pos.x;
+    
+    
+    mCyl.SetC(a);
+    mCyl.SetR(3-local_2);
+    dComIfG_Ccsp()->Set(&mCyl);
+    dComIfGp_getPlayer(1);
+
 }
 
 /* 000005A4-00000794       .text setPointLight__15daObjFirewall_cFv */
@@ -87,7 +109,7 @@ void daObjFirewall_c::setPointLight() {
     */
     //dComIfGp_particle_setProjection()
     for (int i = 0; i < 64; i++) {
-        field_0x46c[i]->mPos.setall(32);
+        field_0x46c[i].mPos.setall(32);
     }
     
     dKy_custom_colset(3, 0, 1.0f);
@@ -145,8 +167,14 @@ void daObjFirewall_c::particle_delete() {
 }
 
 /* 00000A1C-00000AB0       .text seStart__15daObjFirewall_cFUl */
-void daObjFirewall_c::seStart(unsigned long) {
+void daObjFirewall_c::seStart(unsigned long param_1) {
     /* Nonmatching */
+    for(int i=0; i < 8; i++) {
+        
+        mDoAud_seStart(param_1, &field_0x1080[i]);
+    }
+    
+
 }
 
 /* 00000AB0-00000B28       .text set_se__15daObjFirewall_cFb */
@@ -227,15 +255,15 @@ void daObjFirewall_c::setup_burn_up() {
     }
     set_se(true);
     for(int i=0; i < 64; i++) {
-        dKy_plight_set(field_0x46c[i]);
+        dKy_plight_set(&field_0x46c[i]);
         mDoMtx_stack_c::transS(current.pos);
         mDoMtx_stack_c::YrotM(i);
         mDoMtx_stack_c::transM(scale.x *1000.0f,0.0f,0.0f);
         mDoMtx_stack_c::multVecZero(&field_0xc6c[i]);
     }
-    field_0x1070 = 0;
-    field_0x1074 = 32;
-    //field_0x1078 = 2;
+    field_0x1070 = &daObjFirewall_c::burn_wait_act_proc;
+    field_0x1074 = &daObjFirewall_c::burn_wait_act_proc;
+    field_0x1078 = &daObjFirewall_c::burn_wait_act_proc;
     field_0x10e1 = 1;
 }
 
@@ -254,7 +282,7 @@ void daObjFirewall_c::setup_put_the_fire_out() {
         set_se(false);
 
         for (int i = 0; i < 64; i++) {
-            dKy_plight_cut(field_0x46c[i]);
+            dKy_plight_cut(&field_0x46c[i]);
         }
         field_0x10e1 = 0;
     }
@@ -271,6 +299,9 @@ cPhs_State daObjFirewall_c::_create() {
     if (result == cPhs_COMPLEATE_e) {
         if (fopAcM_entrySolidHeap(this, solidHeapCB, 0x1420)) {
             init_mtx();
+            
+            field_0x464[1] = (JPABaseEmitter *)param_get_swSave();
+            dComIfGs_isEventBit(0x3520);
         } else {
             return cPhs_ERROR_e;
         }
@@ -318,7 +349,7 @@ void daObjFirewall_c::wait2_act_proc() {
     if (b < 950.0f && player->current.pos.z < -7000.0f) {
         if(eventInfo.checkCommandDemoAccrpt()) {
             field_0x1070 = 0;
-            field_0x1074 = 32;
+            field_0x1074 = 0;
             //field_0x1078 = 2;
         } else {
             fopAcM_orderOtherEventId(this,0x40,0x40);
@@ -347,11 +378,11 @@ void daObjFirewall_c::appear_act_proc() {
     
     if(field_0x420.getFrameCtrl()->checkState(1)){
         field_0x1070 = 0;
-        field_0x1074 = 32;
+        field_0x1074 = 0;
         field_0x1078 = &daObjFirewall_c::burn_wait_act_proc;
     } else {
         field_0x1070 = 0;
-        field_0x1074 = 22;
+        field_0x1074 = 0;
         field_0x1078 = &daObjFirewall_c::demo_end_wait_act_proc;
     }
 
@@ -364,7 +395,7 @@ void daObjFirewall_c::demo_end_wait_act_proc() {
     if(dComIfGp_evmng_endCheck(field_0x107c)) {
         dComIfGp_event_reset();
         field_0x1070 = 0;
-        field_0x1074 = 22;
+        field_0x1074 = 0;
         field_0x1078 = &daObjFirewall_c::burn_wait_act_proc;
     }
     set_se(true);
@@ -380,21 +411,19 @@ void daObjFirewall_c::burn_wait_act_proc() {
     field_0x420.init(mpModel->getModelData(),local_1, true, 1, -1.0f,0,-1,true,false);
     setup_put_the_fire_out();
     field_0x1070 = 0;
-    field_0x1074 = 22;
+    field_0x1074 = 0;
     field_0x1078 = &daObjFirewall_c::retire_act_proc;
     set_se(true);
 }
 
 /* 00001B68-00001BEC       .text retire_act_proc__15daObjFirewall_cFv */
 void daObjFirewall_c::retire_act_proc() {
-    /* Nonmatching */
     field_0x420.play();
-    if(!field_0x420.getFrameCtrl()->checkState(7) && field_0x420.getFrameCtrl()->getRate() != 0) {
-        dComIfGs_onEventBit(3);
-        fopAcM_delete(1);
+    
+    if(field_0x420.isStop() == TRUE) {
+        dComIfGs_onEventBit(dSv_event_flag_c::UNK_2C01);
+        fopAcM_delete(this);
     }
-    
-    
 }
 
 /* 00001BEC-00001C70       .text _execute__15daObjFirewall_cFv */
