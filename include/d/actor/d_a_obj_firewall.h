@@ -9,10 +9,15 @@
 
 #include "m_Do/m_Do_ext.h"
 
+class daObjFirewall_HIO_c {
+public:
+    daObjFirewall_HIO_c();
+};
+
 class daObjFirewall_c : public fopAc_ac_c {
 public:
     typedef void (daObjFirewall_c::*memberFuncPtr)();
-
+    typedef bool (daObjFirewall_c::*memberFuncPtr2)();
     enum Param_e {
         PRM_SWSAVE_W = 0x08,
         PRM_SWSAVE_S = 0x00,
@@ -56,19 +61,17 @@ public:
     /* 0x420 */ mDoExt_brkAnm field_0x420;
     /* 0x438 */ JPABaseEmitter* field_0x438[6];
     /* 0x450 */ JPABaseEmitter* field_0x450[5];
-    /* 0x464 */ JPABaseEmitter* field_0x464[2]; // guess
+    /* 0x464 */ JPABaseEmitter* field_0x464;
+    /* 0x464 */ s32 mSwitchNo;
     /* 0x46c */ LIGHT_INFLUENCE field_0x46c[64];
-    /* 0xc6c */ Vec field_0xc6c[64];
-    /* 0xf6c */u8 field_0xf6c[0x106c-0xf6c]; // filler
+    /* 0xc6c */ cXyz field_0xc6c[64];
 
-    /* 0x106c */ s32 field_0x106c;
+    /* 0xf6c */ u8 field_0xf6c[0x106c-0xf6c]; // filler
 
+    /* 0x106c */ f32 field_0x106c;
     /* 0x1070 */ memberFuncPtr field_0x1070;
-    /* 0x1074 */ memberFuncPtr field_0x1074;
-    /* 0x1078 */ memberFuncPtr field_0x1078; // this is prob a pointer
-    /* 0x107c */ u16 field_0x107c; // event id?
+    /* 0x107c */ s16 field_0x107c; // event id?
     /* 0x107e */ bool field_0x107e;
-
     /* 0x1080 */ Vec field_0x1080[8];
     /* 0x10e0 */ u8 field_0x10e0;
     /* 0x10e1 */ u8 field_0x10e1;
