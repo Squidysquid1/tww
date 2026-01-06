@@ -17,7 +17,6 @@ public:
 class daObjFirewall_c : public fopAc_ac_c {
 public:
     typedef void (daObjFirewall_c::*memberFuncPtr)();
-    typedef bool (daObjFirewall_c::*memberFuncPtr2)();
     enum Param_e {
         PRM_SWSAVE_W = 0x08,
         PRM_SWSAVE_S = 0x00,
@@ -56,7 +55,7 @@ public:
     /* 0x298 */ dCcD_Stts mStts;
     /* 0x2d4 */ dCcD_Cyl mCyl;
     /* 0x404 */ J3DModel* mpModel;
-    /* 0x408 */ dBgW* field_0x408;// maybe dBgW
+    /* 0x408 */ dBgW* field_0x408;
     /* 0x40c */ mDoExt_btkAnm field_0x40c;
     /* 0x420 */ mDoExt_brkAnm field_0x420;
     /* 0x438 */ JPABaseEmitter* field_0x438[6];
@@ -65,17 +64,16 @@ public:
     /* 0x464 */ s32 mSwitchNo;
     /* 0x46c */ LIGHT_INFLUENCE field_0x46c[64];
     /* 0xc6c */ cXyz field_0xc6c[64];
-
     /* 0xf6c */ u8 field_0xf6c[0x106c-0xf6c]; // filler
-
     /* 0x106c */ f32 field_0x106c;
     /* 0x1070 */ memberFuncPtr field_0x1070;
     /* 0x107c */ s16 field_0x107c; // event id?
     /* 0x107e */ bool field_0x107e;
-    /* 0x1080 */ Vec field_0x1080[8];
+    /* 0x1080 */ cXyz field_0x1080[8];
     /* 0x10e0 */ u8 field_0x10e0;
     /* 0x10e1 */ u8 field_0x10e1;
-    
+    /* 0x10e2 */ u16 field_0x10e2;
+    /* 0x10e4 */ BOOL field_0x10e4;
     /* 0x10e8 */ s32 field_0x10e8;
 }; // Size: 0x10ec
 

@@ -20,8 +20,8 @@ static int l_enter_angl_band;
 
 static const char l_arcname[] = "Yswdr00";
 static const char* l_ev_name_table[] = {"smile", "s_surp", "dummy"};
-//static const char* l_ev_name[] = {"btl_of_swroom", "btl_of_swroom2"};
-static dCcD_SrcCyl l_cyl_sr = {
+//TODO: Convert values to correct flags
+static dCcD_SrcCyl l_cyl_src = {
     // dCcD_SrcGObjInf
     {
         /* Flags             */ 0,
@@ -140,35 +140,13 @@ void daObjFirewall_c::registCollisionTable() {
 /* 000005A4-00000794       .text setPointLight__15daObjFirewall_cFv */
 void daObjFirewall_c::setPointLight() {
     /* Nonmatching */
-    /*
-       6] setPointLight__15daObjFirewall_cFv (func,global) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: _savegpr_28
->>> SYMBOL NOT FOUND: __ptmf_cmpr
->>> SYMBOL NOT FOUND: cM_rndF__Ff
->>> SYMBOL NOT FOUND: cLib_addCalc2__FPffff
->>> SYMBOL NOT FOUND: g_regHIO
-        7] __ct__4cXyzFRC4cXyz (func,weak) found in d_a_obj_firewall.o 
-        7] setall__4cXyzFf (func,weak) found in d_a_obj_firewall.o 
-        7] dComIfGp_particle_setProjection__FUsPC4cXyzPC5csXyzPC4cXyzUcP18dPa_levelEcallBackScPC8_GXColorPC8_GXColorPC4cXyz (func,weak) found in d_a_obj_firewall.o 
-         8] setProjection__13dPa_control_cFUsPC4cXyzPC5csXyzPC4cXyzUcP18dPa_levelEcallBackScPC8_GXColorPC8_GXColorPC4cXyz (func,weak) found in d_a_obj_firewall.o 
-        7] __ct<f>__Q29JGeometry8TVec3<f>Ffff (func,local) found in d_a_obj_firewall.o 
-         8] set<f>__Q29JGeometry8TVec3<f>Ffff (func,local) found in d_a_obj_firewall.o 
-        7] setGlobalParticleScale__14JPABaseEmitterFRCQ29JGeometry8TVec3<f> (func,weak) found in d_a_obj_firewall.o 
-         8] set<f>__Q29JGeometry8TVec3<f>FRCQ29JGeometry8TVec3<f> (func,local) found in d_a_obj_firewall.o 
-        7] setGlobalTranslation__14JPABaseEmitterFfff (func,weak) found in d_a_obj_firewall.o 
-        7] getKageroEcallBack__13dPa_control_cFv (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: mKagero__13dPa_control_c
->>> SYMBOL NOT FOUND: dKy_custom_colset__FUcUcf
->>> SYMBOL NOT FOUND: _restgpr_28
-    */
-
     f32 blend;
     cXyz local_1;
-    /*if (((this->*field_0x1070)() == 0) || ((this->*field_0x1070)() == 0) || ((this->*field_0x1070)() == 0)) {
+    if(field_0x1070 == &daObjFirewall_c::burn_wait_act_proc || field_0x1070 == &daObjFirewall_c::burn_wait_act_proc || field_0x1070 == &daObjFirewall_c::burn_wait_act_proc){
         cLib_addCalc2(&field_0x106c, cM_rndF(0.5f) + 1.0f,0.5f,0.04f);
-    } else {
+    }else {
         field_0x106c = 0.0f;
-    }*/
+    }
 
     for (int i = 0; i < 64; i++) {
         field_0x46c[i].mPos = field_0xc6c[i];
@@ -179,8 +157,7 @@ void daObjFirewall_c::setPointLight() {
         field_0x46c[i].mFluctuation = 250.0f;
 
         if (field_0x106c > 1.0f) {
-            field_0x46c[i].mPos.set(field_0xc6c[i]);
-            field_0x46c[i].mColor;
+
             //local_1.
             //sp14 = temp_r7->unkC6C;
             //sp18 = temp_r7->unkC70;
@@ -214,7 +191,7 @@ void daObjFirewall_c::particle_set() {
     s16 angles_0x438 [6] = {0x1555, -0x1555, 0x4000, -0x4000, 0x6aaa, -0x6aaa};
     s16 angles_0x450 [5] = {0, -0x2aaa, 0x2aaa, 0x5555, 0xaaab};
     csXyz local_1(0,0,0);
-
+    csXyz a;
     for (int i = 0; i < 6; i++) {
         if(field_0x438[i] == NULL) {
             local_1.y = angles_0x438[i];
@@ -299,16 +276,18 @@ void daObjFirewall_c::seDelete() {
 void daObjFirewall_c::set_pl_se() {
     /* Nonmatching */
     int link_id;
+
     // TODO: fix these static tables to the correct data, junk in here atm
-    
     static const char* chk_word_table[] = {"smile", "s_surp", "dummy"};
     static u32 voice_table[] = {0x2e,0x31,0};
+
     link_id = dComIfGp_evmng_getMyStaffId("Link");
     if(link_id != -1) {
         char* cut_name = dComIfGp_getPEvtManager()->getMyNowCutName(link_id);
         if(strcmp(cut_name, chk_word_table[field_0x10e8]) == 0) {
             daPy_py_c* link_player = (daPy_py_c*)dComIfGp_getLinkPlayer();
             if(link_player != NULL) {
+                //TODO: I think this is the wrong way to call voice start
                 link_player->voiceStart(voice_table[field_0x10e8]);
             }
             field_0x10e8 += 1;
@@ -319,38 +298,20 @@ void daObjFirewall_c::set_pl_se() {
 /* 00000C64-00000DDC       .text setup_burn_up__15daObjFirewall_cFv */
 void daObjFirewall_c::setup_burn_up() {
     /* Nonmatching */
-    /*
->>> SYMBOL NOT FOUND: __ct__5csXyzFsss
-          9] dComIfGp_particle_set__FUsPC4cXyzPC5csXyzPC4cXyzUcP18dPa_levelEcallBackScPC8_GXColorPC8_GXColorPC4cXyz (func,weak) found in d_a_obj_firewall.o 
-           10] getParticle__14dComIfG_play_cFv (func,weak) found in d_a_obj_firewall.o 
-           10] setNormal__13dPa_control_cFUsPC4cXyzPC5csXyzPC4cXyzUcP18dPa_levelEcallBackScPC8_GXColorPC8_GXColorPC4cXyz (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: set__13dPa_control_cFUcUsPC4cXyzPC5csXyzPC4cXyzUcP18dPa_levelEcallBackScPC8_GXColorPC8_GXColorPC4cXyz
-          9] __dt__5csXyzFv (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: Regist__4dBgSFP4cBgWP10fopAc_ac_c
->>> SYMBOL NOT FOUND: dKy_plight_set__FP15LIGHT_INFLUENCE
-         8] transS__14mDoMtx_stack_cFRC4cXyz (func,weak) found in d_a_obj_firewall.o 
-          9] transS__14mDoMtx_stack_cFfff (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: now__14mDoMtx_stack_c
->>> SYMBOL NOT FOUND: C_MTXTrans
-         8] YrotM__14mDoMtx_stack_cFs (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: mDoMtx_YrotM__FPA4_fs
->>> SYMBOL NOT FOUND: transM__14mDoMtx_stack_cFfff
-         8] multVecZero__14mDoMtx_stack_cFP3Vec (func,weak) found in d_a_obj_firewall.o 
-          9] mDoMtx_multVecZero__FPA4_CfP3Vec (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: fopAcM_orderOtherEventId__FP10fopAc_ac_csUcUsUsUs
-    */
+    f32 scaledX;
     particle_set();
     if(field_0x408 != NULL) {
-        if (field_0x408->ChkUsed()) {
+        if (!field_0x408->ChkUsed()) {
             dComIfG_Bgsp()->Regist(field_0x408, this);
         }
     }
     set_se(true);
     for(int i=0; i < 64; i++) {
         dKy_plight_set(&field_0x46c[i]);
+        scaledX = scale.x * 1000.0f;
         mDoMtx_stack_c::transS(current.pos);
-        mDoMtx_stack_c::YrotM(i);
-        mDoMtx_stack_c::transM(scale.x *1000.0f,0.0f,0.0f);
+        mDoMtx_stack_c::YrotM(i*0x3ff);
+        mDoMtx_stack_c::transM(scaledX,0.0f,0.0f);
         mDoMtx_stack_c::multVecZero(&field_0xc6c[i]);
     }
     field_0x1070 = &daObjFirewall_c::burn_wait_act_proc;
@@ -388,10 +349,29 @@ cPhs_State daObjFirewall_c::_create() {
 
     if (result == cPhs_COMPLEATE_e) {
         if (fopAcM_entrySolidHeap(this, solidHeapCB, 0x1420)) {
+            cullMtx = mpModel->getBaseTRMtx();
             init_mtx();
-            
+            mStts.Init(-1,-1,this);
+            mCyl.Set(l_cyl_src);
+            mCyl.SetStts(&mStts);
+            mCyl.OnBsRevHit();
+
+            for (int i=0; i < 8; i++) {
+                field_0x1080[i].x = current.angle.y;
+                field_0x1080[i].y = current.pos.y;
+                field_0x1080[i].z = current.pos.y + current.angle.y * 1000.0f;
+            }
+            field_0x10e0 = true;
             mSwitchNo = param_get_swSave();
-            dComIfGs_isEventBit(0x3520);
+            if(dComIfGs_isEventBit(dSv_event_flag_c::UNK_3520) != 1) {
+                field_0x10e4 = TRUE;
+                field_0x107c = dComIfGp_evmng_getEventIdx(l_ev_name_table[1]);
+                field_0x1070 = &daObjFirewall_c::wait2_act_proc;
+            } else {
+                field_0x10e4 = FALSE;
+                field_0x107c = -1;
+                field_0x1070 = &daObjFirewall_c::wait_act_proc;
+            }
         } else {
             return cPhs_ERROR_e;
         }
