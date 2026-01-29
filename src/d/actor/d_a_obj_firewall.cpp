@@ -14,9 +14,9 @@
 #include "d/d_com_inf_game.h"
 #include "d/d_s_play.h"
 
-
+static s16 zou_chk_angl[] = {0xD556,0x2AAA, 0x5555, 0xAAAB,0x8000};
 namespace {
-static int l_enter_angl_band;
+static s32 l_enter_angl_band = abs(0xe00);
 
 static const char l_arcname[] = "Yswdr00";
 static const char* l_ev_name_table[] = {"smile", "s_surp", "dummy"};
@@ -92,8 +92,8 @@ bool daObjFirewall_c::create_heap() {
 /* 000002DC-00000568       .text registCollisionTable__15daObjFirewall_cFv */
 void daObjFirewall_c::registCollisionTable() {
     /* Nonmatching */
-    /*
-    5] registCollisionTable__15daObjFirewall_cFv (func,global) found in d_a_obj_firewall.o 
+/*
+      5] registCollisionTable__15daObjFirewall_cFv (func,global) found in d_a_obj_firewall.o 
        6] __ct__4cXyzFv (func,weak) found in d_a_obj_firewall.o 
        6] l_HIO (object,local) found in d_a_obj_firewall.o 
        6] __as__4cXyzFRC4cXyz (func,weak) found in d_a_obj_firewall.o 
@@ -113,14 +113,27 @@ void daObjFirewall_c::registCollisionTable() {
         7] SetVec__11dCcD_GObjAtFR4cXyz (func,weak) found in d_a_obj_firewall.o 
        6] dComIfG_Ccsp__Fv (func,weak) found in d_a_obj_firewall.o 
 >>> SYMBOL NOT FOUND: Set__4cCcSFP8cCcD_Obj
-    */
-    f32 local_2;
-    s16 local_1 = cM_atan2s(dComIfGp_getPlayer(0)->current.pos.y, dComIfGp_getPlayer(0)->current.pos.x);
-    if(abs(local_1) > l_enter_angl_band) {
-        
+*/
+    s16 temp_r3_3;
+    
+    fopAc_ac_c* player = dComIfGp_getPlayer(0);
+    f32 r_modifier = -1.0f;
+    s16 local_1 = cM_atan2s(player->current.pos.x - current.pos.x, player->current.pos.z - current.pos.z);
+    s32 temp_r3_2 = abs(local_1);
+    if(temp_r3_2 < l_enter_angl_band) {
+        r_modifier = cM_scos(l_enter_angl_band) * 30.0f + 100.0f;
     } else {
-        for (int i=0; i<6; i++) {
-            local_2 = JMASCos(0x3f);
+        for (int i=0; i < 5; i++) {
+            
+            temp_r3_3 = abs(local_1 - zou_chk_angl[i]);
+            if(temp_r3_3 < 0x1A00) {
+
+                r_modifier = cM_scos(temp_r3_3) * 115.0f + 100.0f;
+                break;
+            }
+        }
+        if(r_modifier == -1.0f) {
+            r_modifier = 100.0f;
         }
     }
     
@@ -131,10 +144,13 @@ void daObjFirewall_c::registCollisionTable() {
     f32 height = scale.y * 10000.0f + 300.0f;
     
     mCyl.SetC(pos);
-    mCyl.SetR(base_radius * 1000.0 - local_2);
-    mCyl.SetH(height * 10000.0f + 300.0f);
-    dComIfG_Ccsp()->Set(&mCyl);
+    mCyl.SetR(base_radius - r_modifier);
+    mCyl.SetH(height);
+    
+    cXyz at_vec = current.pos - player->current.pos;
+    mCyl.SetAtVec(at_vec);
 
+    dComIfG_Ccsp()->Set(&mCyl);
 }
 
 /* 000005A4-00000794       .text setPointLight__15daObjFirewall_cFv */
@@ -285,12 +301,15 @@ void daObjFirewall_c::set_pl_se() {
     if(link_id != -1) {
         char* cut_name = dComIfGp_getPEvtManager()->getMyNowCutName(link_id);
         if(strcmp(cut_name, chk_word_table[field_0x10e8]) == 0) {
-            daPy_py_c* link_player = (daPy_py_c*)dComIfGp_getLinkPlayer();
-            if(link_player != NULL) {
+            
+            
+            daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0); // There is an inline but not in debug map
+            if(player != NULL) {
+                //voice_table[field_0x10e8]+=1;
                 //TODO: I think this is the wrong way to call voice start
-                link_player->voiceStart(voice_table[field_0x10e8]);
+                player->voiceStart(voice_table[field_0x10e8]);
+                field_0x10e8 += 1;  
             }
-            field_0x10e8 += 1;
         }
     }
 }
@@ -418,14 +437,18 @@ void daObjFirewall_c::wait_act_proc() {
 /* 000016D4-00001820       .text wait2_act_proc__15daObjFirewall_cFv */
 void daObjFirewall_c::wait2_act_proc() {
     /* Nonmatching */
-    daPy_py_c* player = (daPy_py_c*)dComIfGp_getLinkPlayer();
-    cXyz a = player->current.pos - current.pos;   
-    f32 b = a.absXZ();
-    if (b < 950.0f && player->current.pos.z < -7000.0f) {
+    daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0);
+    if(player == NULL){
+        return;
+    }
+
+    f32 temp = (current.pos - player->current.pos).absXZ();
+    
+    if (temp < 950.0f && player->current.pos.z < -7000.0f) {
         if(eventInfo.checkCommandDemoAccrpt()) {
             field_0x1070 = 0;
         } else {
-            fopAcM_orderOtherEventId(this,0x40,0x40);
+            fopAcM_orderOtherEventId(this,field_0x107c,0xff);
         }
     }
 }

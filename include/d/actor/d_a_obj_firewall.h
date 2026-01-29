@@ -61,7 +61,7 @@ public:
     /* 0x438 */ JPABaseEmitter* field_0x438[6];
     /* 0x450 */ JPABaseEmitter* field_0x450[5];
     /* 0x464 */ JPABaseEmitter* field_0x464;
-    /* 0x464 */ s32 mSwitchNo;
+    /* 0x468 */ s32 mSwitchNo;
     /* 0x46c */ LIGHT_INFLUENCE field_0x46c[64];
     /* 0xc6c */ cXyz field_0xc6c[64];
     /* 0xf6c */ u8 field_0xf6c[0x106c-0xf6c]; // filler
