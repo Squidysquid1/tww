@@ -92,28 +92,6 @@ bool daObjFirewall_c::create_heap() {
 /* 000002DC-00000568       .text registCollisionTable__15daObjFirewall_cFv */
 void daObjFirewall_c::registCollisionTable() {
     /* Nonmatching */
-/*
-      5] registCollisionTable__15daObjFirewall_cFv (func,global) found in d_a_obj_firewall.o 
-       6] __ct__4cXyzFv (func,weak) found in d_a_obj_firewall.o 
-       6] l_HIO (object,local) found in d_a_obj_firewall.o 
-       6] __as__4cXyzFRC4cXyz (func,weak) found in d_a_obj_firewall.o 
-        7] __as__3VecFRC3Vec (func,weak) found in d_a_obj_firewall.o 
-       6] @4357 (object,local) found in d_a_obj_firewall.o 
-       6] @4358 (object,local) found in d_a_obj_firewall.o 
-       6] SetC__8cM3dGCylFRC4cXyz (func,weak) found in d_a_obj_firewall.o 
-       6] SetR__8cM3dGCylFf (func,weak) found in d_a_obj_firewall.o 
-       6] SetH__8cM3dGCylFf (func,weak) found in d_a_obj_firewall.o 
-       6] dComIfGp_getPlayer__Fi (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: g_dComIfG_gameInfo
-        7] getPlayer__14dComIfG_play_cFi (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: __mi__4cXyzCFRC3Vec
-       6] __dt__4cXyzFv (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: __dl__FPv
-       6] SetAtVec__12dCcD_GObjInfFR4cXyz (func,weak) found in d_a_obj_firewall.o 
-        7] SetVec__11dCcD_GObjAtFR4cXyz (func,weak) found in d_a_obj_firewall.o 
-       6] dComIfG_Ccsp__Fv (func,weak) found in d_a_obj_firewall.o 
->>> SYMBOL NOT FOUND: Set__4cCcSFP8cCcD_Obj
-*/
     s16 temp_r3_3;
     
     fopAc_ac_c* player = dComIfGp_getPlayer(0);
@@ -121,14 +99,14 @@ void daObjFirewall_c::registCollisionTable() {
     s16 local_1 = cM_atan2s(player->current.pos.x - current.pos.x, player->current.pos.z - current.pos.z);
     s32 temp_r3_2 = abs(local_1);
     if(temp_r3_2 < l_enter_angl_band) {
-        r_modifier = cM_scos(l_enter_angl_band) * 30.0f + 100.0f;
+        r_modifier = cM_scos(cM_s2rad(l_enter_angl_band)) * 30.0f + 100.0f;
     } else {
         for (int i=0; i < 5; i++) {
             
             temp_r3_3 = abs(local_1 - zou_chk_angl[i]);
             if(temp_r3_3 < 0x1A00) {
 
-                r_modifier = cM_scos(temp_r3_3) * 115.0f + 100.0f;
+                r_modifier = 100.0f + 115.0f * cM_scos(cM_s2rad(temp_r3_3)) ;
                 break;
             }
         }
@@ -157,7 +135,7 @@ void daObjFirewall_c::registCollisionTable() {
 void daObjFirewall_c::setPointLight() {
     /* Nonmatching */
     f32 blend;
-    cXyz local_1;
+    cXyz pos;
     if(field_0x1070 == &daObjFirewall_c::burn_wait_act_proc || field_0x1070 == &daObjFirewall_c::burn_wait_act_proc || field_0x1070 == &daObjFirewall_c::burn_wait_act_proc){
         cLib_addCalc2(&field_0x106c, cM_rndF(0.5f) + 1.0f,0.5f,0.04f);
     }else {
@@ -172,19 +150,9 @@ void daObjFirewall_c::setPointLight() {
         field_0x46c[i].mPower = (REG12_F(0) + 800.0f) * field_0x106c;
         field_0x46c[i].mFluctuation = 250.0f;
 
-        if (field_0x106c > 1.0f) {
-
-            //local_1.
-            //sp14 = temp_r7->unkC6C;
-            //sp18 = temp_r7->unkC70;
-            //sp1C = temp_r7->unkC74;
-            
-            //a.setall(1.5f * field_0x106c);
-            //temp_f0 = ;
-            ///sp8 = temp_f0;
-            //spC = temp_f0;
-            //sp10 = temp_f0;
-            //sp18 += (1.1f * ((220.0f + g_regHIO.unk6D0) * temp_f5));
+        if (field_0x106c > 1.0f) {            
+            field_0xc6c[i].y += (1.1f * ((220.0f + REG12_S(0)) * 2));
+            field_0xc6c[i].setall(1.5f * field_0x106c);
         }
     }
 
@@ -305,7 +273,6 @@ void daObjFirewall_c::set_pl_se() {
             
             daPy_py_c* player = (daPy_py_c*)dComIfGp_getPlayer(0); // There is an inline but not in debug map
             if(player != NULL) {
-                //voice_table[field_0x10e8]+=1;
                 //TODO: I think this is the wrong way to call voice start
                 player->voiceStart(voice_table[field_0x10e8]);
                 field_0x10e8 += 1;  
